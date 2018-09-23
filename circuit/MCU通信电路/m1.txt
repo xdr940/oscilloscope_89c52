@@ -1,0 +1,56 @@
+//MCU1
+
+#include <reg51.h>
+#define   uchar		 unsigned char
+#define OutPut P1
+sbit ST= P2^0;	  //传数组开始的时候 置为高电平
+sbit sendEn= P3^6;	  //传一个元素高电平一下,可以发送==可写
+sbit EndRead = P3^7;
+    data  unsigned  char F[]={1,1,2,3,4,0xFF,6,7,8,9,10,11,12,13,14,15, };	//可变数组一定要加data关键字，要不然全是零！
+ 
+ void delay( uchar a){
+	uchar i =0;
+	 	for( i=0;i<a;i++);
+	 
+}
+   void send()	{
+ 		 uchar i =0;
+	  	
+		ST=1;//开始传送数组，此时MCU2进入中断处理函数
+	//	ST=0;
+		 for(i=0;i<16;i++){
+		  
+		     while(!EndRead);	//d对方收到信息，更新下一帧信息
+			
+		
+		   P1=F[i];		//2us 左右 数据是0-9 四根线	
+		   
+		    sendEn=1;
+					delay(2);
+		   sendEn=0;
+		   	//	delay(2);
+	   	}//for	
+
+	   	ST=0;//传送结束
+   	
+  }
+void main(){
+	
+ 	  int i=0;
+	 
+	  P1=0;P1=0xff;P1=0;P1=0xff;
+	  ST=0;
+	  sendEn=0;
+	 //unsigned char F[]={0xFE,0xFC,0XF8,0XF0,0XE0,0XC0,0X80,0X00,
+	//		 0x00,0x80,0XC0,0XE0,0XF0,0XF8,0XFC,0XFE};
+//while(1){
+
+	 send();	//用send(F)后失灵，而且地址变了.传入的是F
+//	}
+
+
+
+}
+
+
+
